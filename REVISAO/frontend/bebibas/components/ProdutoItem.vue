@@ -3,6 +3,7 @@ import { type Produto } from "~/models/produtos";
 type propType = {
   produto: Produto;
 };
+
 const props = defineProps<propType>();
 </script>
 
