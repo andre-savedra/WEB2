@@ -5,11 +5,14 @@ type propType = {
 };
 
 const props = defineProps<propType>();
+console.log("produto recebido", props.produto);
+
 </script>
 
 <template>
   <section
     class="cartao flex flex-column align-items-center justify-content-center"
+    v-if="props.produto"
   >
     <div class="produto-imagem">
       <img :src="props.produto.fotos[0]" />
@@ -18,7 +21,7 @@ const props = defineProps<propType>();
       <h4>{{ props.produto.nome }}</h4>
     </div>
     <div class="flex flex-row">
-      <span>R${{ props.produto.preco.toPrecision(4) }} - </span>
+      <span>R${{  props.produto.preco }} - </span>
       <div class="ml-2">
         <label>Qtd. Disponível: </label>
         <span>{{ props.produto.quantidade }} </span>
