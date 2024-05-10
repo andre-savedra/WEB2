@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { type Produto } from "~/models/produtos";
+import { carrinho } from "#imports";
+const { adicionarNoCarrinho, getCarrinho } = carrinho();
+
 type propType = {
   produto: Produto;
 };
 
 const props = defineProps<propType>();
-console.log("produto recebido", props.produto);
 
+const adicionarItem = ()=> {
+  adicionarNoCarrinho(props.produto);
+  console.log("CARRINHO ATUAL: ", getCarrinho());
+}
 </script>
 
 <template>
@@ -27,7 +33,7 @@ console.log("produto recebido", props.produto);
         <span>{{ props.produto.quantidade }} </span>
       </div>
     </div>
-    <Button class="botao-add" label="Adicionar" />
+    <Button @click="adicionarItem" class="botao-add" label="Adicionar" />
   </section>
 </template>
 

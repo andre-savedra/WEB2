@@ -51,6 +51,15 @@ export const carrinho = defineStore('carrinhoStore', {
         getProdutoDoCarrinhoIndex: (carrinho:Carrinho) => (produtoParaEncontrar: Produto)=>{
             return carrinho.produtos.findIndex(item=>item.produto.id === produtoParaEncontrar.id);
         },
-        getCarrinho: (carrinho: Carrinho) => carrinho
+        getCarrinho: (carrinho: Carrinho) => () : Array<CarrinhoItem> => {
+            return carrinho.produtos;
+        },
+        getValorTotalDoCarrinho: (carrinho: Carrinho) => () : Number => {
+            let soma = 0;
+            carrinho.produtos.forEach(item=>{
+                soma += (item.produto.preco * item.quantidade)
+            })
+            return soma;
+        }
     }
   })

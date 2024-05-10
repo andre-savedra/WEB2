@@ -35,9 +35,9 @@ atualizarProdutos();
 <template>
   <main
    
-  class="home-container flex flex-column align-items-center justify-content-center"
+  class="home-container flex flex-column align-items-center"
   >
-    <h1>homeee</h1>
+    <h2 class="mt-4 mb-4">🥃 Nossos Produtos</h2>
     <div
       class="produtos-container grid align-items-center justify-content-center"
     >

@@ -20,7 +20,22 @@ const itensMenu = ref([
 <template>
   <header>
     <div class="flex align-items-center justify-content-center">
-        <Menubar :model="itensMenu" />
+        <div class="menu-item flex align-items-center justify-content-center mr-4">
+          <i class="pi pi-home mr-1"></i>
+          <NuxtLink to="/home">Produtos</NuxtLink>
+        </div>
+        <div class="menu-item flex align-items-center justify-content-center mr-4">
+          <i class="pi pi-wallet mr-1"></i>
+          <NuxtLink to="/pagamento">Pagamentos</NuxtLink>
+        </div>
+        <div class="menu-item flex align-items-center justify-content-center mr-4">
+          <i class="pi pi-briefcase mr-1"></i>
+          <NuxtLink to="/pedidos">Meus Pedidos</NuxtLink>
+        </div>
+        <div class="menu-item flex align-items-center justify-content-center mr-4">
+          <i class="pi pi-shopping-cart mr-1"></i>
+          <NuxtLink to="/carrinho">Carrinho</NuxtLink>
+        </div>
     </div>
   </header>
 </template>
@@ -31,14 +46,16 @@ header {
   height: var(--altura-header);
   border-bottom: 1px solid black;
 
-  .p-menubar{
-    height: 30px;
-    border: none;
-
-    .p-menuitem{
-        margin: 0 1rem 0 1rem;
-    }
+  .menu-item{
+    height: var(--altura-header);
     
+    a{
+      text-decoration: none;
+      color: black;
+    }
+    &:hover{
+      transform: scale(1.1);
+    }
   }
 }
 </style>

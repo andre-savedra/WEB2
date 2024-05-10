@@ -7,7 +7,7 @@ class AdminUsuarioCustomizado(UserAdmin):
     list_display = ['id', 'email', 'cpf']
     list_display_links = ('id', 'email', 'cpf',)
     ordering = ['email']
-    search_fields = ['nome',]
+    search_fields = ['email',]
 
 admin.site.register(UsuarioCustomizado,AdminUsuarioCustomizado)
 

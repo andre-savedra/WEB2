@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
   primevue: {
     components: {
-      include: ['Button', 'Avatar', 'InputText', 'FloatLabel', 'Menubar']
+      include: ['Button', 'Avatar', 'InputText', 'FloatLabel', 'Menubar', 'DataTable']
     }
   },
   css: [
