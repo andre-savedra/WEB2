@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { getProdutos } from "~/services/produtos";
-import { onMounted } from "vue";
 import { type Produto } from "~/models/produtos";
 import { type Ref, ref } from "vue";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
+
+const show = () => {
+    toast.add({ severity: 'success', summary: '  Produto Adicionado', detail: 'Acesse-o em seu carrinho', life: 30000 });
+};
 
 const produtos: Ref<Array<Produto>> = ref([]);
 
@@ -10,17 +15,7 @@ definePageMeta({
   middleware: "auth",
 });
 
-const produtoTeste: Produto = {
-  id: 1,
-  nome: "Produto Teste",
-  preco: 30.5,
-  quantidade: 50,
-  categoriaFK: {
-    id: 1,
-    nome: "Regrigerantes",
-  },
-  fotos: ["https://m.media-amazon.com/images/I/61WGKm79FgL.jpg"],
-};
+
 
 const atualizarProdutos = () => {
   getProdutos().then((produtosEncontrados) => {
@@ -33,16 +28,14 @@ atualizarProdutos();
 </script>
 
 <template>
-  <main
-   
-  class="home-container flex flex-column align-items-center"
-  >
+  <main class="home-container flex flex-column align-items-center">
     <h2 class="mt-4 mb-4">🥃 Nossos Produtos</h2>
+    <Toast />
     <div
       class="produtos-container grid align-items-center justify-content-center"
     >
         <div v-for="(produto,index) in produtos">
-            <ProdutoItem :key="index" class="col-4" :produto="produto" />
+            <ProdutoItem :key="index" class="col-4" :produto="produto" @eventoAdicionado="show" />
         </div>
     </div>
   </main>
@@ -57,5 +50,12 @@ atualizarProdutos();
   background-image: url("background1.jpg");
   background-repeat: repeat;
   background-size: cover;
+
+  
 }
+
+.p-toast-summary		{
+  padding: 1.5rem !important;
+}
+
 </style>

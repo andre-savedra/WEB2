@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from .models import *
 
+
 class UsuarioCustomizadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioCustomizado
-        fields = ['id','email','telefone','cpf','endereco',]
+        fields = ['id','email','telefone','cpf','endereco','is_active','groups','user_permissions']
         many = True
 
 class CategoriaProdutosSerializer(serializers.ModelSerializer):
@@ -34,7 +35,7 @@ class ProdutosSerializer(serializers.ModelSerializer):
 
 
 class VendasSerializer(serializers.ModelSerializer):
-    usuarioFK = UsuarioCustomizadoSerializer(read_only=True)
+    # usuarioFK = UsuarioCustomizadoSerializer(read_only=True)
     class Meta:
         model = Vendas
         fields = '__all__'

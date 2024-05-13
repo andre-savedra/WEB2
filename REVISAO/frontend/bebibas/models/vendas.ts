@@ -1,16 +1,17 @@
 import type { Produto } from "./produtos";
 import type { Usuario } from "./usuario";
 
-enum PAGAMENTOS {
-    'P' = "PENDENTE",
-    'A' = "APROVADO",
-    'C' = "CANCELADO",
-    'R' = "RECUSADO",
+export enum PAGAMENTOS {
+    'PENDENTE' = "P",
+    'APROVADO' = "A",
+    'CANCELADO' = "C",
+    'RECUSADO' = "R",
 }
 
 export type Venda = {
-    usuarioFK: Usuario;
-    dataHora: string;
+    id?: number,
+    usuarioFK: string;
+    dataHora?: string;
     status: PAGAMENTOS
 } 
 
@@ -19,4 +20,11 @@ export type VendasProduto = {
     produtoFK: Produto;
     quantidade: number;
     vendaFK: Venda;
+}
+
+
+export type VendasProdutoBody = {
+    produtoFK: number;
+    quantidade: number;
+    vendaFK: number;
 }

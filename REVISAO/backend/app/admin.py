@@ -6,8 +6,21 @@ class AdminUsuarioCustomizado(UserAdmin):
     model=UsuarioCustomizado
     list_display = ['id', 'email', 'cpf']
     list_display_links = ('id', 'email', 'cpf',)
-    ordering = ['email']
+    fieldsets = (
+        (None,{'fields': ('email','password')}),
+        ('Permissions', {'fields': ('is_staff','is_active','groups','user_permissions',)}),
+        ('Management', {'fields': ('last_login',)}),
+        ('Custom fields', {'fields': ('cpf','telefone','endereco',)}),
+    )
+    filter_horizontal = ('groups','user_permissions',)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email','password1','password2', 'is_staff','is_active','groups','user_permissions',)
+        }),
+    )    
     search_fields = ['email',]
+    ordering = ['email']
 
 admin.site.register(UsuarioCustomizado,AdminUsuarioCustomizado)
 

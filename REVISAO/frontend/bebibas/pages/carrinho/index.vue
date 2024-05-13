@@ -1,28 +1,79 @@
 <script setup lang="ts">
 import { computed } from "#imports";
 import { carrinho, type CarrinhoItem } from "#imports";
-const { getCarrinho, removerDoCarinho, getValorTotalDoCarrinho } = carrinho();
+const { getCarrinho, removerDoCarinho, getValorTotalDoCarrinho, esvaziarCarrinho } = carrinho();
+import { salvarVenda, salvarVendaProdutos } from "~/services/vendas";
+const { data } = useAuth();
+import { PAGAMENTOS, type VendasProdutoBody } from "~/models/vendas";
+import { type Usuario } from "~/models/usuario";
 
 definePageMeta({
   middleware: "auth",
 });
 
+const usuarioLogado = computed<Usuario | null>(() => {
+  if (data.value) {
+    return data.value?.results[0] ? data.value?.results[0] as Usuario : null;
+  }
+  return null;
+});
+
 //pegando os itens que estão no carrinho e salvando
 //na variavel
-const itensNoCarrinho: Array<CarrinhoItem> = getCarrinho();
-const valorTotal = computed(()=> getValorTotalDoCarrinho());
+const itensNoCarrinho = computed<Array<CarrinhoItem>>(()=>getCarrinho());
+const valorTotal = computed(() => getValorTotalDoCarrinho().toPrecision(5));
+
+const carregando = ref(false);
+const salvo = ref(false);
 
 console.log("itens No carrinho.....", itensNoCarrinho);
 
-const deletarDoCarrinho = (itemParaRemover: CarrinhoItem)=> {
-    removerDoCarinho({
-        produto: itemParaRemover.produto,
-        quantidade: 0
-    });
+const deletarDoCarrinho = (itemParaRemover: CarrinhoItem) => {
+  removerDoCarinho({
+    produto: itemParaRemover.produto,
+    quantidade: 0
+  });
 }
 
-const salvarPedido = ()=> {
-        
+const salvarPedido = () => {
+  if (getCarrinho().length) {
+    carregando.value = true;
+    console.log("data", data.value)
+    salvarVenda({
+      status: PAGAMENTOS.PENDENTE,
+      usuarioFK: usuarioLogado.value ? `${usuarioLogado.value.id}` : ''
+    }).then(vendaSalva => {
+      console.log("venda salva: ", vendaSalva);
+      let payload: Array<VendasProdutoBody> = [];
+      getCarrinho().forEach(item => {
+        payload.push({
+          vendaFK: vendaSalva?.id ?? 0,
+          produtoFK: item.produto.id ?? 0,
+          quantidade: item.quantidade,
+        })
+      });
+
+      salvarVendaProdutos(payload).then(resposta => {
+        console.log("ITENS DE VENDA SALVOS!", resposta);
+        setTimeout(() => {
+          salvo.value = true;
+          
+          esvaziarCarrinho();
+        }, 3000);
+      }).catch(error => {
+        console.error("Erro ao salvar venda! ", error);
+      });
+
+    }).catch(error => {
+      console.error("Erro ao salvar venda! ", error);
+    })
+      .finally(() => {
+        setTimeout(() => {
+          carregando.value = false;
+        }, 3000);
+      });
+  }
+
 }
 
 </script>
@@ -30,22 +81,25 @@ const salvarPedido = ()=> {
 <template>
   <main class="carrinho-container flex flex-column align-items-center">
     <h2 class="mt-4 mb-4">🛒 Seu carrinho de compras</h2>
-    <table >
-        <thead>
-            <tr>
-              <td>Item</td>
-              <td>Produto</td>
-              <td>Descrição</td>
-              <td>Categoria</td>
-              <td>Preço Unitário</td>
-              <td>Quantidade</td>
-              <td>Subtotal</td>
-              <td>Ações</td>
-            </tr>
-        </thead>
+    <div class="card flex justify-content-center" v-if="carregando">
+      <ProgressSpinner />
+    </div>
+    <table v-if="!carregando">
+      <thead>
+        <tr class="text-center">
+          <td>Item</td>
+          <td>Produto</td>
+          <td>Descrição</td>
+          <td>Categoria</td>
+          <td>Preço Unitário</td>
+          <td>Quantidade</td>
+          <td>Subtotal</td>
+          <td>Ações</td>
+        </tr>
+      </thead>
       <tbody>
-        <tr v-for="(itemCarrinho ,index) in itensNoCarrinho" :key="index">
-          <td>{{ index }}</td>
+        <tr v-for="(itemCarrinho, index) in itensNoCarrinho" :key="index" class="text-center">
+          <td>{{ index + 1 }}</td>
           <td><img class="fotoProduto" :src="itemCarrinho.produto.fotos[0]" alt="foto produto" /></td>
           <td>{{ itemCarrinho.produto.nome }}</td>
           <td>{{ itemCarrinho.produto.categoriaFK.nome }}</td>
@@ -53,52 +107,34 @@ const salvarPedido = ()=> {
           <td>{{ itemCarrinho.quantidade }}</td>
           <td>R$ {{ itemCarrinho.quantidade * itemCarrinho.produto.preco }}</td>
           <td>
-            <Button @click="deletarDoCarrinho(itemCarrinho)"  label=""><i class="pi pi-trash"></i></Button>
+            <Button @click="deletarDoCarrinho(itemCarrinho)" label=""><i class="pi pi-trash"></i></Button>
           </td>
         </tr>
-        <section class="flex flex-row align-items-center justify-content-center valor-total ">
-            <span class="mr-2">Valor Total: </span>
-            <span> R${{ valorTotal }}</span>
-        </section>
-      </tbody>    
+      </tbody>
+      <tfoot>
+        <tr class="text-center">
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th>Valor Total:</th>
+          <th>R${{ valorTotal }}</th>
+        </tr>
+      </tfoot>
     </table>
-    <Button @click="salvarPedido" class="mt-2 botao-pedido bg-primary" label="Fechar pedido"></Button>
-    <!-- <div
-       class="produtos-container grid align-items-center justify-content-center"
-     >
-         <div v-for="(produto,index) in produtos">
-             <ProdutoItem :key="index" class="col-4" :produto="produto" />
-         </div>
-     </div> -->
-
-     <!-- <div class="card">
-        <DataTable :value="itensNoCarrinho">
-          <template #header>
-            <div
-              class="flex flex-wrap align-items-center justify-content-between gap-2"
-            >
-              <span class="text-xl text-900 font-bold"
-                >🛒 Seu carrinho de compras</span
-              >
-            </div>
-          </template>
-          <Column field="produto.nome" header="Nome"></Column>
-          <Column header="Image">
-            <template #body="slotProps">
-              <img
-                :src="`${slotProps.data.produto.foto[0]}`"
-                :alt="slotProps.data.nome"
-                class="w-6rem border-round"
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </div> -->
+    <Button :disabled="salvo" v-if="!carregando" @click="salvarPedido" class="mt-2 botao-pedido bg-primary" label="Fechar pedido" />
+    <Message v-if="salvo" severity="success">
+      <p>Pedido realizado com sucesso!</p>
+      <p>Consulte seus itens em <NuxtLink to="/pedidos">Meus Pedidos</NuxtLink> </p>
+    </Message>
 
   </main>
 </template>
 
 <style scoped lang="scss">
+$largura-tabela: 90vw;
+
 .carrinho-container {
   margin: 0;
   width: 100vw;
@@ -108,37 +144,48 @@ const salvarPedido = ()=> {
   background-repeat: repeat;
   background-size: cover;
 }
-table{
-    background-color: white;
-    border-radius: 1rem;
-}
-thead{
-    font-weight: bold;
-    tr{
-        border-bottom: 2px solid black
-    }
-}
-td{
-    padding: 1rem;
+
+table {
+  width: $largura-tabela;
+  background-color: white;
+  border-radius: 1rem;
 }
 
-.fotoProduto{
-    width: 50px;
-    height: 50px;
+thead {
+  font-weight: bold;
+
+  tr {
+    border-bottom: 2px solid black
+  }
 }
 
-Button{
-    background-color: white;
-    color: rgb(114, 15, 15);
-    border: none;
-}
-.valor-total{
-    font-weight: bold;
-    
+td {
+  padding: 1rem;
 }
 
-.botao-pedido{
-    width: 250px;
-    height: 50px;
+.fotoProduto {
+  width: 50px;
+  height: 50px;
+}
+
+Button {
+  background-color: white;
+  color: rgb(114, 15, 15);
+  border: none;
+}
+
+.valor-total {
+  font-weight: bold;
+  width: 900px
+}
+
+.botao-pedido {
+  width: $largura-tabela;
+  height: 30px;
+
+  &:hover {
+    transform: scale(1.05);
+    transition: 2s;
+  }
 }
 </style>

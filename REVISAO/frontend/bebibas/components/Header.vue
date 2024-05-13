@@ -44,7 +44,6 @@ const itensMenu = ref([
 header {
   width: 100vw;
   height: var(--altura-header);
-  border-bottom: 1px solid black;
 
   .menu-item{
     height: var(--altura-header);

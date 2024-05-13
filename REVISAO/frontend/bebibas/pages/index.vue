@@ -6,6 +6,8 @@ definePageMeta({
     layout: 'login'
 })
 
+
+
 const credenciais = reactive({
     email: '',
     password: ''
@@ -29,10 +31,26 @@ const fazerLogin = () => {
             }, 3000);
         })
 }
+
+
+const painel = ref();
+
+const toggle = (event: any) => {
+    painel.value.toggle(event);
+}
 </script>
 
 <template>
     <main class="login-main flex align-items-center justify-content-center">
+        <div class="chatbot">
+            <Button type="button" icon="pi pi-comment" label="Chatbot" @click="toggle" />
+            <OverlayPanel ref="painel">
+                <iframe allow="microphone;" width="350" height="430"
+                    src="https://console.dialogflow.com/api-client/demo/embedded/a423ff1d-1da7-4eae-b5a3-9f59361ec297">
+                </iframe>
+            </OverlayPanel>
+        </div>
+
         <section class="login-container flex flex-column align-items-center justify-content-center">
             <h4 class="row-login">Adega Santo Antônio</h4>
             <div class="row-login">
@@ -90,5 +108,12 @@ const fazerLogin = () => {
             }
         }
     }
+}
+
+.chatbot{
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 1rem
 }
 </style>

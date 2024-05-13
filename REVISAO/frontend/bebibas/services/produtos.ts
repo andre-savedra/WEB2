@@ -1,4 +1,3 @@
-import { type Ref } from "vue";
 import { BACKEND_URL } from "~/models/app";
 import type { Pagination } from "~/models/pagination";
 import type { Produto } from "~/models/produtos";

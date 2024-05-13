@@ -42,9 +42,15 @@ export const carrinho = defineStore('carrinhoStore', {
                 carrinhoItem
             ];
         }
+      },
+      esvaziarCarrinho(){
+        this.produtos = [];
       }
     },
     getters: {
+        estaNoCarrinho: (carrinho:Carrinho) => (produtoParaEncontrar: Produto): boolean =>{
+            return carrinho.produtos.findIndex(item=>item.produto.id === produtoParaEncontrar.id) !== -1;
+        },
         getProdutoDoCarrinho: (carrinho:Carrinho) => (produtoParaEncontrar: Produto)=>{
             return carrinho.produtos.find(item=>item.produto.id === produtoParaEncontrar.id);
         },

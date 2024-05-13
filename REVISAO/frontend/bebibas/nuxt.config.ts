@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
   primevue: {
     components: {
-      include: ['Button', 'Avatar', 'InputText', 'FloatLabel', 'Menubar', 'DataTable']
+      include: ['Button', 'Avatar', 'InputText', 'FloatLabel', 'Menubar', 'DataTable', 'Checkbox', 'Toast', 'ProgressSpinner', 'Message', 'OverlayPanel']
     }
   },
   css: [
@@ -27,10 +27,13 @@ export default defineNuxtConfig({
       endpoints: {
         signIn: { path: '/token/login', method: 'post' },
         signOut: { path: '/token/logout', method: 'post' },
-        getSession: { path: '/categoria-produtos', method: 'get' },
+        getSession: { path: '/usuarios', method: 'get' },
       },
       token: { signInResponseTokenPointer: '/auth_token', type: 'Token' },
-      pages: { login: '/' }
+      pages: { login: '/' },
+      sessionDataType: {
+        results: 'Array'
+      }
     }
   }
 })
