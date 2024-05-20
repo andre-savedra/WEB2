@@ -35,7 +35,7 @@ class ProdutosSerializer(serializers.ModelSerializer):
 
 
 class VendasSerializer(serializers.ModelSerializer):
-    # usuarioFK = UsuarioCustomizadoSerializer(read_only=True)
+    #usuarioFK = UsuarioCustomizadoSerializer(read_only=True)
     class Meta:
         model = Vendas
         fields = '__all__'
@@ -43,8 +43,10 @@ class VendasSerializer(serializers.ModelSerializer):
 
 
 class VendaProdutosSerializer(serializers.ModelSerializer):
+    produtoFK = ProdutosSerializer
+
     class Meta:
+        many = True
         model = VendasProdutos
         fields = '__all__'
-        many = True
 
