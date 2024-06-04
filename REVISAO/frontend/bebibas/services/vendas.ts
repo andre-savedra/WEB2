@@ -1,18 +1,27 @@
 import { BACKEND_URL } from "~/models/app";
 import type { Venda, VendasProduto, VendasProdutoBody } from "~/models/vendas";
 
-export const salvarVenda = (venda: Venda): Promise<Venda | null> => {
-  return useFetch<Venda>(`${BACKEND_URL}/vendas/`, {
+export const salvarVenda = async (venda: Venda): Promise<Venda | null> => {
+  const {error,data} = await useFetch<Venda>(`${BACKEND_URL}/vendas/`, {
     method: 'POST',
     body: venda
   })
-    .then(resposta => {
+
+  if(error.value){
+    console.log("error useFetch", error.value);
+    return Promise.reject(null);
+  }
+  
+  return Promise.resolve(data.value);
+
+    /*.then(resposta => {
+      console.log("success response")
       return Promise.resolve(resposta.data.value);
     })
     .catch(error => {
       console.log("error", error);
-      return Promise.resolve(null);
-    })
+      return Promise.reject(null);
+    })*/
 };
 
 
@@ -26,7 +35,7 @@ export const salvarVendaProdutos = (vendas: Array<VendasProdutoBody>): Promise<V
     })
     .catch(error => {
       console.log("error", error);
-      return Promise.resolve(null);
+      return Promise.reject(null);
     })
 };
 

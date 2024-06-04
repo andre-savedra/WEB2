@@ -69,3 +69,5 @@ export const carrinho = defineStore('carrinhoStore', {
         }
     }
   })
+
+

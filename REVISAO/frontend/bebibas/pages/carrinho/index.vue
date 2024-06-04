@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "#imports";
+import { computed, type Ref } from "#imports";
 import { carrinho, type CarrinhoItem } from "#imports";
 const { getCarrinho, removerDoCarinho, getValorTotalDoCarrinho, esvaziarCarrinho } = carrinho();
 import { salvarVenda, salvarVendaProdutos } from "~/services/vendas";
@@ -24,7 +24,7 @@ const itensNoCarrinho = computed<Array<CarrinhoItem>>(()=>getCarrinho());
 const valorTotal = computed(() => getValorTotalDoCarrinho().toPrecision(5));
 
 const carregando = ref(false);
-const salvo = ref(false);
+const salvo: Ref<boolean|null> = ref(null);
 
 console.log("itens No carrinho.....", itensNoCarrinho);
 
@@ -39,6 +39,7 @@ const salvarPedido = () => {
   if (getCarrinho().length) {
     carregando.value = true;
     console.log("data", data.value)
+
     salvarVenda({
       status: PAGAMENTOS.PENDENTE,
       usuarioFK: usuarioLogado.value ? `${usuarioLogado.value.id}` : ''
@@ -61,15 +62,19 @@ const salvarPedido = () => {
           esvaziarCarrinho();
         }, 3000);
       }).catch(error => {
+        salvo.value = false;
         console.error("Erro ao salvar venda! ", error);
       });
 
     }).catch(error => {
+      salvo.value = false;
       console.error("Erro ao salvar venda! ", error);
     })
       .finally(() => {
+        console.log("SALVO STATUS", salvo)
         setTimeout(() => {
           carregando.value = false;
+          salvo.value = null;
         }, 3000);
       });
   }
@@ -123,11 +128,15 @@ const salvarPedido = () => {
         </tr>
       </tfoot>
     </table>
-    <Button :disabled="salvo" v-if="!carregando" @click="salvarPedido" class="mt-2 botao-pedido bg-primary" label="Fechar pedido" />
-    <Message v-if="salvo" severity="success">
+    <Button :disabled="salvo !== null" v-if="!carregando" @click="salvarPedido" class="mt-2 botao-pedido bg-primary" label="Fechar pedido" />
+    <Message v-if="salvo === true" severity="success">
       <p>Pedido realizado com sucesso!</p>
       <p>Consulte seus itens em <NuxtLink to="/pedidos">Meus Pedidos</NuxtLink> </p>
     </Message>
+    <Message v-if="salvo === false" severity="error">
+      <p>Não foi possível salvar esta venda! 😥</p>      
+    </Message>
+
 
   </main>
 </template>

@@ -8,6 +8,7 @@ type propType = {
   produto: Produto;
 };
 
+
 const props = defineProps<propType>();
 
 const emit = defineEmits(['eventoAdicionado']); 
@@ -22,6 +23,11 @@ const produtoNoCarrinho = computed(()=>{
   return estaNoCarrinho(props.produto);   
 });
 
+const detalheProduto = ()=>{
+    const idProduto = props.produto.id;
+    navigateTo(`/home/${idProduto}`);
+}
+
 </script>
 
 <template>
@@ -29,7 +35,7 @@ const produtoNoCarrinho = computed(()=>{
     <div class="check text-right">      
       <Checkbox v-model="produtoNoCarrinho" :binary="true" :readonly="true"/>
     </div>
-    <div class="produto-imagem">
+    <div class="produto-imagem" @click="detalheProduto">
       <img :src="props.produto.fotos[0]" />
     </div>
     <div>
@@ -42,7 +48,8 @@ const produtoNoCarrinho = computed(()=>{
         <span>{{ props.produto.quantidade }} </span>
       </div>
     </div>
-    <Button @click="adicionarItem" class="botao-add" label="Adicionar" />
+    <Button :disabled="!props.produto.quantidade" @click="adicionarItem" class="botao-add" 
+        :label="props.produto.quantidade? 'Adicionar' : 'Não disponível'" />
   </section>
 </template>
 

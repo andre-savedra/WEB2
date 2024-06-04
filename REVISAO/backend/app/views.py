@@ -40,6 +40,21 @@ class VendasView(ModelViewSet):
     queryset = Vendas.objects.all() 
     serializer_class = VendasSerializer
 
+    def create(self, request, *args, **kwargs):
+        #coleta os dados que vem do front
+        data = request.data
+        #consulta no banco para as condições previstas
+        vendasDoUsuario = Vendas.objects.filter(usuarioFK=data['usuarioFK']).filter(status="P")
+        print("quantidade de vendas pendentes: ", vendasDoUsuario.count())
+        
+        #se o limite de vendas for alçado impede a criação desta venda
+        if vendasDoUsuario.count() >= 3:
+            print("limite excedido")
+            return Response(status=403,data='Usuário com mais de 3 vendas pendentes!')
+        else:
+            #se o limite ainda não foi alcançado!
+            return super().create(request, *args, **kwargs)
+
 class VendasProdutosView(CustomModelViewSet):
     queryset = VendasProdutos.objects.all() 
     serializer_class = VendaProdutosSerializer
